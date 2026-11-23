@@ -1,7 +1,7 @@
-// A pose: where the head is at one moment, and the SVG transform that puts a group of shapes
-// there. The drawing is flat; the head turns because what is on the face travels round it as a
-// mark on a ball does.
-import type { Group } from "./draw.ts";
+// A pose: where the head is at one moment, the SVG transform that puts the whole head there,
+// and where the head's turn takes a point on the face. The drawing is flat; the head turns
+// because what lies on the face travels round it as a mark on a ball does.
+import type { Point } from "./part.ts";
 
 export type Pose = {
   /** The head's shift, in drawing units, and its tilt, in degrees. */
@@ -21,7 +21,7 @@ export type Pose = {
   open: number;
 };
 
-/** The head as it is drawn: every transform is empty. */
+/** The head as it is drawn: nothing has moved. */
 export const REST: Pose = {
   x: 0,
   y: 0,
@@ -35,38 +35,28 @@ export const REST: Pose = {
 };
 
 const DEGREES = Math.PI / 180;
-/** The ball the face is on: its middle, and how far it reaches across and down. It is a little
- * inside the head's outline, so a mark at its edge is still on the face. */
-const BALL = { x: 50, y: 56, rx: 36, ry: 34 } as const;
+/** The ball the face is the front of: its middle, and how far it reaches across and down. It
+ * is wider than the head, whose face is the ball's shallow front, so that what lies near the
+ * head's edge still has room to travel and a hairline keeps a smooth line as it goes. */
+const BALL = { x: 50, y: 55.5, rx: 45, ry: 40 } as const;
 /** The furthest the head turns and the eyes turn beyond it, across and down, in radians. */
-const HEAD = [28 * DEGREES, 20 * DEGREES] as const;
-const EYES = [11 * DEGREES, 9 * DEGREES] as const;
+const HEAD = [22 * DEGREES, 16 * DEGREES] as const;
+const EYES = [9 * DEGREES, 7 * DEGREES] as const;
 /** The head tilts about its chin and stretches from it. */
 const CHIN = [50, 88] as const;
 /** How much a full breath stretches the head up, and narrows it. */
 const BREATH = { tall: 0.022, wide: -0.012 } as const;
-/** The least a turned mark narrows to, so it never thins to nothing at the edge. */
-const THIN = 0.25;
+/** Closed eyes keep this much of their height, so they read as a line. */
+const SLIVER = 0.12;
 
 /** A value to the nearest step, without the float's tail. */
 const snap = (value: number, step: number) =>
   Math.round(Math.round(value / step) * step * 1e4) / 1e4;
 
-/** Where a mark at `from` on the ball's width or height is once the ball has turned by `angle`,
- * and how much it has narrowed. */
-function turned(from: number, middle: number, reach: number, angle: number) {
-  const before = Math.asin(Math.max(-1, Math.min(1, (from - middle) / reach)));
-  const after = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, before + angle));
-  return {
-    to: middle + reach * Math.sin(after),
-    narrow: Math.max(THIN, Math.cos(after) / Math.cos(before)),
-  };
-}
-
-/** The `transform` attribute for a group in a pose, empty when it has not moved. `step` is the
- * smallest movement worth making, in drawing units: a pose is drawn to the nearest step, so an
- * avatar a few pixels wide is given a new transform only when it would move on the screen. */
-export function transformOf(group: Group, pose: Pose, step = 0.01): string {
+/** The `transform` attribute that puts the whole head in a pose, empty when it has not moved.
+ * `step` is the smallest movement worth making, in drawing units: a pose is drawn to the
+ * nearest step, so an avatar a few pixels wide changes only when it would move on the screen. */
+export function headTransform(pose: Pose, step = 0.01): string {
   const parts: string[] = [];
   const [x, y] = [snap(pose.x, step), snap(pose.y, step)];
   if (x || y) parts.push(`translate(${x} ${y})`);
@@ -79,25 +69,54 @@ export function transformOf(group: Group, pose: Pose, step = 0.01): string {
       `translate(${snap(CHIN[0] * (1 - wide), 0.001)} ${snap(CHIN[1] * (1 - tall), 0.001)}) scale(${snap(wide, 1e-4)} ${snap(tall, 1e-4)})`,
     );
   }
-  if (group.at) {
-    const eyes = group.on === "eyes";
-    const across = pose.turnX * HEAD[0] + (eyes ? pose.gazeX * EYES[0] : 0);
-    const down = pose.turnY * HEAD[1] + (eyes ? pose.gazeY * EYES[1] : 0);
-    const [ax, ay] = group.at;
-    const h = turned(ax, BALL.x, BALL.rx, across);
-    const v = turned(ay, BALL.y, BALL.ry, down);
-    // Closed eyes keep a sliver, so they read as a line.
-    const shut = eyes ? snap(Math.min(0.88, 1 - pose.open), 0.02) : 0;
-    const scale = Math.min(0.02, step / 8);
-    // What is rounded is how far it has moved and narrowed, so at rest it is exactly as drawn.
-    const sx = snap(1 - snap(1 - h.narrow, scale), 1e-4);
-    const sy = snap(1 - snap(1 - v.narrow * (1 - shut), scale), 1e-4);
-    const [tx, ty] = [
-      snap(ax + snap(h.to - ax, step), 1e-4),
-      snap(ay + snap(v.to - ay, step), 1e-4),
-    ];
-    if (tx !== ax || ty !== ay || sx !== 1 || sy !== 1)
-      parts.push(`translate(${tx} ${ty}) scale(${sx} ${sy}) translate(${-ax} ${-ay})`);
-  }
   return parts.join(" ");
+}
+
+/** How far the ball has turned, across and down in radians, and how far an eye on it has shut,
+ * from 0 to 1. `key` is the same for two turns that draw alike. */
+export type Turn = { across: number; down: number; shut: number; key: string };
+
+/** The turn of the face in a pose, or of the eyes, which turn a little further by themselves
+ * and can shut. It is drawn to the nearest step, as `headTransform` is. */
+export function turnOf(pose: Pose, eyes: boolean, step = 0.01): Turn {
+  const least = step / BALL.rx;
+  const across = snap(pose.turnX * HEAD[0] + (eyes ? pose.gazeX * EYES[0] : 0), least);
+  const down = snap(pose.turnY * HEAD[1] + (eyes ? pose.gazeY * EYES[1] : 0), least);
+  const shut = eyes ? snap(1 - pose.open, Math.min(0.05, step / 4)) : 0;
+  return { across, down, shut, key: `${across} ${down} ${shut}` };
+}
+
+/** What moves the points of a shape on the face for a turn: a point goes where a mark there on
+ * the ball goes as the ball turns, and a point of an eye then closes onto the eye's middle. */
+export function mover(
+  turn: Turn,
+  eye?: Point,
+): (x: number, y: number) => readonly [number, number] {
+  const [sinA, cosA] = [Math.sin(turn.across), Math.cos(turn.across)];
+  const [sinD, cosD] = [Math.sin(turn.down), Math.cos(turn.down)];
+  const onBall = (x: number, y: number): readonly [number, number] => {
+    let [u, v] = [(x - BALL.x) / BALL.rx, (y - BALL.y) / BALL.ry];
+    // A point off the ball is carried by the nearest point of its edge.
+    const far = Math.max(1, Math.hypot(u, v));
+    [u, v] = [u / far, v / far];
+    const [offX, offY] = [x - (BALL.x + BALL.rx * u), y - (BALL.y + BALL.ry * v)];
+    const w = Math.sqrt(Math.max(0, 1 - u * u - v * v));
+    // Turned across, then down.
+    let across = u * cosA + w * sinA;
+    const depth = w * cosA - u * sinA;
+    let down = v * cosD + depth * sinD;
+    // A point turned out of sight stays at the edge it went round.
+    if (depth * cosD - v * sinD < 0) {
+      const reach = Math.hypot(across, down) || 1;
+      [across, down] = [across / reach, down / reach];
+    }
+    return [BALL.x + BALL.rx * across + offX, BALL.y + BALL.ry * down + offY];
+  };
+  if (!eye) return onBall;
+  const middle = onBall(eye[0], eye[1])[1];
+  const open = 1 - turn.shut * (1 - SLIVER);
+  return (x, y) => {
+    const [tx, ty] = onBall(x, y);
+    return [tx, middle + (ty - middle) * open];
+  };
 }

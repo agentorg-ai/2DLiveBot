@@ -15,12 +15,9 @@ test("a seed's avatar is the same on every machine and in every release", () => 
   );
 });
 
-test("seeds spread over what there is to choose, each a face and eyes", () => {
+test("seeds spread over what there is to choose, each a face and eyes and nothing else yet", () => {
   const made = Array.from({ length: 200 }, (_, i) => avatarFromSeed(`agent-${i}`));
-  for (const text of made) {
-    const avatar = parseAvatar(text);
-    assert.ok(avatar.face && avatar.eyes);
-  }
+  for (const text of made) assert.deepEqual(Object.keys(parseAvatar(text)), ["face", "eyes"]);
   const skins = new Set(made.map((text) => parseAvatar(text).face?.colors[0]));
   assert.equal(skins.size, 6);
 });

@@ -1,6 +1,6 @@
-// The demo page: avatars from seeds and strings, and an editor that changes an avatar's parts and
-// shows its string. With `?many=50` in the address it shows that many avatars and nothing else,
-// for measuring what a full page costs.
+// The demo page: an editor that changes an avatar's parts and shows its string, a sheet of that
+// avatar turned each way, and avatars from seeds. With `?many=50` in the address it shows that
+// many avatars and nothing else, for measuring what a full page costs.
 import { createElement, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
@@ -30,7 +30,20 @@ const SEEDS = [
   "support",
   "reviewer",
 ];
+/** Avatars with parts on, which seeds do not choose yet. */
+const DRESSED = [
+  "v1.round-f7e3cf.dot-2a2530.bob-5a3a2a",
+  "v1.round-e9c09c.dot-2a2530.crop-2d2630",
+  "v1.round-f4d6b8.dot-2a2530.bob-b4513a.specs-2a2530",
+  "v1.round-ab7852.dot-2a2530.crop-2d2630.specs-b23a48",
+  "v1.round-f7e3cf.dot-2a2530.crop-a0673c.beanie-4f7cac",
+  "v1.round-d2a078.dot-2a2530.bob-2d2630.beanie-d98b5f",
+  "v1.round-f4d6b8.dot-2a2530.beanie-6b9a7a",
+  "v1.round-e9c09c.dot-2a2530.bob-d2a04c.specs-7a4a35.beanie-8b6fb3",
+];
 const STATES: State[] = ["idle", "working", "asleep"];
+const ACROSS = [-1, -0.66, -0.33, 0, 0.33, 0.66, 1];
+const DOWN = [-1, 0, 1];
 
 const at = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 const make = <K extends keyof HTMLElementTagNameMap>(tag: K, props: object = {}) =>
@@ -39,7 +52,9 @@ const make = <K extends keyof HTMLElementTagNameMap>(tag: K, props: object = {})
 const many = Number(new URLSearchParams(location.search).get("many"));
 if (many) {
   const grid = make("main", { className: "row many" });
-  for (let i = 0; i < many; i++) mount(grid, { seed: `agent-${i}`, size: 40 });
+  const value = new URLSearchParams(location.search).get("value");
+  for (let i = 0; i < many; i++)
+    mount(grid, value ? { value, size: 40 } : { seed: `agent-${i}`, size: 40 });
   document.querySelector("main")?.replaceWith(grid);
 } else page();
 
@@ -53,7 +68,7 @@ function page() {
   });
 
   // The editor.
-  let avatar = parseAvatar("v1");
+  let avatar = parseAvatar(DRESSED[0] as string);
   /** The slots the plain avatar fills, which have no "none". */
   const plain = parseAvatar("v1");
   const big = mount(at("big"), { value: formatAvatar(avatar), size: 260 });
@@ -61,6 +76,15 @@ function page() {
     size,
     mounted: mount(at("small"), { value: formatAvatar(avatar), size }),
   }));
+  // The sheet: the editor's avatar, still, turned each way.
+  const sheet = DOWN.flatMap((y) => {
+    const row = make("div", { className: "row" });
+    at("turning").append(row);
+    return ACROSS.map((x) => ({
+      look: { x, y },
+      mounted: mount(row, { value: formatAvatar(avatar), size: 84, look: { x, y }, still: true }),
+    }));
+  });
   const state = at<HTMLSelectElement>("state");
   const still = at<HTMLInputElement>("still");
   const follow = at<HTMLInputElement>("follow");
@@ -80,6 +104,7 @@ function page() {
     };
     big.update({ ...shown, size: 260 });
     for (const { size, mounted } of small) mounted.update({ ...shown, size });
+    for (const { look, mounted } of sheet) mounted.update({ value, size: 84, look, still: true });
     if (document.activeElement !== text) text.value = value;
     problem.textContent = "";
   };
@@ -145,49 +170,33 @@ function page() {
   });
   load(formatAvatar(avatar));
 
-  // Turning: a face for each way of looking, from left to right and from up to down.
-  for (const y of [-1, 0, 1]) {
-    const row = make("div", { className: "row" });
-    for (const x of [-1, -0.66, -0.33, 0, 0.33, 0.66, 1])
-      mount(row, { value: "v1", size: 84, look: { x, y }, still: true });
-    at("turning").append(row);
-  }
-
-  // The face shapes, side by side.
-  for (const part of PARTS)
-    if (part.slot === "face") {
-      const figure = make("figure");
-      mount(figure, { value: `v1.${part.id}`, size: 110 });
-      figure.append(make("figcaption", { textContent: part.id }));
-      at("shapes").append(figure);
-    }
-
-  // From seeds. Each opens in the editor.
-  for (const name of SEEDS) {
+  /** A live avatar that opens in the editor. */
+  const opener = (into: HTMLElement, value: string, name: string) => {
     const button = make("button", { type: "button", title: name });
-    button.setAttribute("aria-label", `Edit the avatar of ${name}`);
-    mount(button, { seed: name, size: 72 });
+    button.setAttribute("aria-label", `Edit ${name}`);
+    mount(button, { value, size: 72 });
     button.addEventListener("click", () => {
-      seed.value = name;
-      load(avatarFromSeed(name));
+      load(value);
       at("big").scrollIntoView({ behavior: "smooth", block: "center" });
     });
-    at("seeded").append(button);
-  }
+    into.append(button);
+  };
+  for (const value of DRESSED) opener(at("dressed"), value, value);
+  for (const name of SEEDS) opener(at("seeded"), avatarFromSeed(name), name);
 
   for (const size of [20, 28, 40, 64])
-    for (const name of SEEDS.slice(0, 6)) mount(at("sizes"), { seed: name, size });
+    for (const value of DRESSED.slice(0, 6)) mount(at("sizes"), { value, size });
 
-  for (const name of STATES) mount(at("states"), { seed: "planner", size: 96, state: name });
+  for (const name of STATES)
+    mount(at("states"), { value: DRESSED[2] as string, size: 96, state: name });
 
-  for (const name of SEEDS.slice(0, 6)) {
-    const svg = toSvg(avatarFromSeed(name));
+  for (const value of DRESSED.slice(0, 6)) {
     at("images").append(
       make("img", {
         width: 56,
         height: 56,
-        alt: name,
-        src: `data:image/svg+xml,${encodeURIComponent(svg)}`,
+        alt: "",
+        src: `data:image/svg+xml,${encodeURIComponent(toSvg(value))}`,
       }),
     );
   }
