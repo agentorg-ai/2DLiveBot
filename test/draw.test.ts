@@ -4,50 +4,55 @@ import { draw } from "../src/draw.ts";
 import { face, parseAvatar, toSvg } from "../src/index.ts";
 import { pathText, segmentsOf } from "../src/path.ts";
 
-const dressed = "v1.round-e9c09c.dot-3a2f5b.bob-b4513a.specs-7a4a35.beanie-4f7cac";
+const haired = "v1.round-e9c09c.dot-3a2f5b.waves-b4513a";
 
 test("a still picture is SVG that carries no style, script or link", () => {
-  const svg = toSvg(dressed);
+  const svg = toSvg(haired);
   assert.match(svg, /^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg" viewBox="/);
   assert.doesNotMatch(svg, /style|script|href|url\(|<image/);
-  // Its colours are the string's, each as it is or in its shade.
-  for (const color of ["e9c09c", "3a2f5b", "b4513a", "7a4a35", "4f7cac"])
-    assert.ok(svg.includes(`#${color}`), color);
-  assert.equal(new Set(svg.match(/#[0-9a-f]{6}/g)).size, 7);
+  // Its colours are the string's, and flat: no others are in it.
+  assert.deepEqual([...new Set(svg.match(/#[0-9a-f]{6}/g))].sort(), [
+    "#3a2f5b",
+    "#b4513a",
+    "#e9c09c",
+  ]);
 });
 
 test("a picture is a square that fits its figure, with room to move", () => {
-  assert.match(toSvg("v1"), /viewBox="6 11.5 88 88"/);
-  // Hair and a hat reach further than the face, so the square is larger.
-  const [, , side] = draw(parseAvatar(dressed)).viewBox.split(" ").map(Number);
-  assert.ok(side !== undefined && side > 95 && side < 110);
+  assert.match(toSvg("v1"), /viewBox="7 12.5 86 86"/);
+  // Hair reaches further than the face, so the square is larger.
+  const [, , side] = draw(parseAvatar(haired)).viewBox.split(" ").map(Number);
+  assert.ok(side !== undefined && side > 100 && side < 120);
 });
 
-test("parts are painted back to front: hair behind, the head, the eyes, glasses, hair, the hat", () => {
-  const colours = draw(parseAvatar(dressed)).shapes.map((shape) => shape.paint.stroke);
-  const first = (color: string) => colours.indexOf(`#${color}`);
-  const last = (color: string) => colours.lastIndexOf(`#${color}`);
-  // The mass behind the head is in the hair's shade, which is no colour of the string.
-  assert.ok(first("e9c09c") === 1 && colours[0] !== "#b4513a");
-  assert.ok(first("e9c09c") < first("3a2f5b") && last("3a2f5b") < first("7a4a35"));
-  assert.ok(last("7a4a35") < first("b4513a") && first("b4513a") < first("4f7cac"));
+test("parts are painted back to front: hair behind the head, the head, the eyes, the hair over it", () => {
+  assert.deepEqual(
+    draw(parseAvatar(haired)).shapes.map((shape) => shape.paint.fill),
+    ["#b4513a", "#e9c09c", "#3a2f5b", "#3a2f5b", "#b4513a"],
+  );
 });
 
 test("a shape turns when some of it lies on the face, and an eye lies on it whole", () => {
-  const { shapes } = draw(parseAvatar("v1.bob.specs"));
   assert.deepEqual(
-    shapes.map((shape) => [shape.turns, shape.eye]),
+    draw(parseAvatar(haired)).shapes.map((shape) => [shape.turns, shape.eye]),
     [
       [false, undefined],
       [false, undefined],
       [true, [33.5, 60]],
       [true, [66.5, 60]],
       [true, undefined],
-      [true, undefined],
-      [true, undefined],
-      [true, undefined],
     ],
   );
+});
+
+test("hair is one shape whose rim stays and whose hairline is on the face", () => {
+  const hair = draw(parseAvatar(haired)).shapes.at(-1);
+  assert.ok(hair);
+  const onFace = hair.segments.map((segment) => segment.face);
+  // A run of rim, a run of hairline, and the rim again to close.
+  const runs = onFace.filter((on, i) => on !== onFace[i - 1]);
+  assert.deepEqual(runs, [false, true, false]);
+  assert.equal(hair.segments.at(-1)?.command, "Z");
 });
 
 test("a path is read stretch by stretch, and written back as it was drawn", () => {

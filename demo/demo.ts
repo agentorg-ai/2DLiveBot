@@ -30,16 +30,14 @@ const SEEDS = [
   "support",
   "reviewer",
 ];
-/** Avatars with parts on, which seeds do not choose yet. */
+/** Avatars with hair, which seeds do not choose yet. */
 const DRESSED = [
-  "v1.round-f7e3cf.dot-2a2530.bob-5a3a2a",
-  "v1.round-e9c09c.dot-2a2530.crop-2d2630",
-  "v1.round-f4d6b8.dot-2a2530.bob-b4513a.specs-2a2530",
-  "v1.round-ab7852.dot-2a2530.crop-2d2630.specs-b23a48",
-  "v1.round-f7e3cf.dot-2a2530.crop-a0673c.beanie-4f7cac",
-  "v1.round-d2a078.dot-2a2530.bob-2d2630.beanie-d98b5f",
-  "v1.round-f4d6b8.dot-2a2530.beanie-6b9a7a",
-  "v1.round-e9c09c.dot-2a2530.bob-d2a04c.specs-7a4a35.beanie-8b6fb3",
+  "v1.round-f7e3cf.dot-2a2530.waves-5b3a2c",
+  "v1.round-f4d6b8.dot-2a2530.waves-2d2630",
+  "v1.round-e9c09c.dot-2a2530.waves-b4513a",
+  "v1.round-ab7852.dot-2a2530.waves-3b2a26",
+  "v1.round-f7e3cf.dot-2a2530.waves-d2a04c",
+  "v1.round-d2a078.dot-2a2530.waves-8d8a93",
 ];
 const STATES: State[] = ["idle", "working", "asleep"];
 const ACROSS = [-1, -0.66, -0.33, 0, 0.33, 0.66, 1];
@@ -185,12 +183,12 @@ function page() {
   for (const name of SEEDS) opener(at("seeded"), avatarFromSeed(name), name);
 
   for (const size of [20, 28, 40, 64])
-    for (const value of DRESSED.slice(0, 6)) mount(at("sizes"), { value, size });
+    for (const value of DRESSED) mount(at("sizes"), { value, size });
 
   for (const name of STATES)
     mount(at("states"), { value: DRESSED[2] as string, size: 96, state: name });
 
-  for (const value of DRESSED.slice(0, 6)) {
+  for (const value of DRESSED) {
     at("images").append(
       make("img", {
         width: 56,

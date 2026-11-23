@@ -108,7 +108,7 @@ test("as the head turns, what lies on the face travels round it and narrows towa
 });
 
 test("a hairline goes with the face while the hair's rim stays: the lock ahead thins, the other widens", () => {
-  // A bob's locks at eye level: rims at 9 and 91, hairline at 19 and 81.
+  // Two locks of hair at eye level: their rims at 9 and 91, their hairlines at 19 and 81.
   const turned = settled({ x: 1, y: 0 });
   const [left, right] = [placed(turned, 19, 56.5)[0], placed(turned, 81, 56.5)[0]];
   assert.ok(left - 9 > (19 - 9) * 1.8, "the lock we turn away from widens");

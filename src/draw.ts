@@ -17,19 +17,8 @@ export type Drawn = {
 };
 export type Drawing = { viewBox: string; shapes: Drawn[] };
 
-/** A filled shape's edge: a rim of its own colour, half seen, so it meets what is behind it
- * softly. */
-const EDGE = { "stroke-width": "1.2", "stroke-opacity": "0.45", "stroke-linejoin": "round" };
 /** The room a picture leaves round the figure, for it to move in. */
-const ROOM = 6;
-
-const channels = (hex: string) => [0, 2, 4].map((i) => Number.parseInt(hex.slice(i, i + 2), 16));
-/** A colour in shade: a fifth of the way to a cool dark, as flat colour is shaded by hand. */
-const shade = (hex: string) =>
-  channels(hex)
-    .map((value, i) => Math.round(value + ((channels("34203f")[i] ?? value) - value) * 0.2))
-    .map((value) => value.toString(16).padStart(2, "0"))
-    .join("");
+const ROOM = 5;
 
 /** The drawing of an avatar: its shapes back to front, in a square that fits the figure. */
 export function draw(avatar: Avatar): Drawing {
@@ -41,19 +30,13 @@ export function draw(avatar: Avatar): Drawing {
 
   const shapes = layers.flatMap(({ layer, colors }) =>
     layer.shapes.map((shape): Drawn => {
-      const color = (paint: Paint) => {
-        if (paint.startsWith("#")) return paint;
-        const own = colors[Number.parseInt(paint, 10)] ?? "000000";
-        return `#${paint.endsWith("-") ? shade(own) : own}`;
-      };
-      const paint: Record<string, string> = { fill: "none" };
-      if (shape.fill)
-        Object.assign(paint, { fill: color(shape.fill), stroke: color(shape.fill) }, EDGE);
+      const color = (paint: Paint) =>
+        paint.startsWith("#") ? paint : `#${colors[Number(paint)] ?? "000000"}`;
+      const paint: Record<string, string> = { fill: shape.fill ? color(shape.fill) : "none" };
       if (shape.stroke)
         Object.assign(paint, {
           stroke: color(shape.stroke),
           "stroke-width": String(shape.width ?? 1),
-          "stroke-opacity": "1",
           "stroke-linecap": "round",
           "stroke-linejoin": "round",
         });

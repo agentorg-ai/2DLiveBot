@@ -4,12 +4,12 @@
 /** The places on the figure a part can go, in the order an avatar's string lists them. An avatar
  * has at most one part in each. A new slot joins at the end, so the strings there are stay as
  * they are written. */
-export const SLOTS = ["face", "eyes", "hair", "eyewear", "headwear"] as const;
+export const SLOTS = ["face", "eyes", "hair"] as const;
 export type Slot = (typeof SLOTS)[number];
 
-/** What a shape is painted with: one of its part's colours by position (`"0"`, `"1"`), as it is
- * or shaded (`"0-"`), or a fixed colour (`#rrggbb`). */
-export type Paint = `${number}${"" | "-"}` | `#${string}`;
+/** What a shape is painted with: one of its part's colours by position (`"0"`, `"1"`), or a
+ * fixed colour (`#rrggbb`). */
+export type Paint = `${number}` | `#${string}`;
 
 /** A point in the drawing space. */
 export type Point = readonly [number, number];
@@ -32,14 +32,7 @@ export type Path = string | readonly (string | OnFace)[];
 export type Shape = { d: Path; fill?: Paint; stroke?: Paint; width?: number };
 
 /** Paint order across every layer of an avatar, low first. */
-export const Z = {
-  behind: 10,
-  head: 40,
-  features: 50,
-  eyewear: 55,
-  hair: 60,
-  headwear: 70,
-} as const;
+export const Z = { behind: 10, head: 40, features: 50, hair: 60 } as const;
 
 /** Shapes painted together. Every layer rides the head as it shifts, tilts and breathes. */
 export type Layer = {
