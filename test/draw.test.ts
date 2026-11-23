@@ -76,6 +76,20 @@ test("every hair is flat shapes whose rim stays and whose hairline is on the fac
   }
 });
 
+test("glasses are lines that lie on the face whole, painted over the eyes and under the hair", () => {
+  const { shapes } = draw(parseAvatar("v1.round-e9c09c.dot-3a2f5b.waves-b4513a.specs-7a4a35"));
+  const frame = shapes.filter((shape) => shape.paint.stroke === "#7a4a35");
+  // Two rims, a bridge and two arms.
+  assert.equal(frame.length, 5);
+  for (const shape of frame) {
+    assert.equal(shape.paint.fill, "none");
+    assert.ok(shape.segments.every((segment) => segment.face));
+  }
+  const order = shapes.map((shape) => shape.paint.stroke ?? shape.paint.fill);
+  assert.ok(order.lastIndexOf("#3a2f5b") < order.indexOf("#7a4a35"));
+  assert.ok(order.lastIndexOf("#7a4a35") < order.lastIndexOf("#b4513a"));
+});
+
 test("a path is read stretch by stretch, and written back as it was drawn", () => {
   const segments = segmentsOf(["M1 2L3 4", face("C5 6 7 8 9 10 11 12 13 14 15 16"), "Q1 1 2 2Z"]);
   assert.deepEqual(

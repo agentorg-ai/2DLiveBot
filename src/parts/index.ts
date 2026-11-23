@@ -1,13 +1,14 @@
 // The catalog: every part an avatar's string can name. A part joins it by being listed here.
 import type { Part, Slot } from "../part.ts";
 import { dot } from "./eyes/dot.ts";
+import { specs } from "./eyewear/specs.ts";
 import { round } from "./face/round.ts";
 import { mane } from "./hair/mane.ts";
 import { sides } from "./hair/sides.ts";
 import { sweep } from "./hair/sweep.ts";
 import { waves } from "./hair/waves.ts";
 
-export const PARTS: readonly Part[] = [round, dot, waves, mane, sweep, sides];
+export const PARTS: readonly Part[] = [round, dot, waves, mane, sweep, sides, specs];
 
 const byId = new Map(PARTS.map((part) => [part.id, part]));
 export const partOf = (id: string): Part | undefined => byId.get(id);

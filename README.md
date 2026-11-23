@@ -1,23 +1,25 @@
 # 2DLiveBot
 
 Animated character avatars for the web, drawn flat. An avatar is a soft, wide head with two dot
-eyes and hair on it. One string holds every setting of an avatar, and
+eyes, and hair and glasses on it. One string holds every setting of an avatar, and
 mounting that string in a page makes the avatar live: it breathes, blinks, looks about, turns
-its head and follows the pointer, and its hair turns with it.
+its head and follows the pointer, and what it wears turns with it.
 
 The library has no dependencies and loads nothing: every drawing is in its code. It builds its
 SVG with DOM calls and moves it through SVG attributes, so it works under a content policy that
 allows neither inline styles nor code from text.
 
-This is a prototype: the face, the eyes, and four hair styles, each flat and known by its
-outline. It is not on npm yet.
+This is a prototype: the face, the eyes, four hair styles, each flat and known by its
+outline, and a pair of glasses. It is not on npm yet.
 
 ![The four hair styles, each front on and looking left, right and down](docs/hair.png)
+
+![The glasses alone and with each hair style, front on and looking left, right and down](docs/glasses.png)
 
 ## The avatar's string
 
 ```
-v1.round-f7e3cf.dot-2a2530.waves-5b3a2c
+v1.round-f7e3cf.dot-2a2530.waves-5b3a2c.specs-2a2530
 ```
 
 `v1` is the format. Each part follows a dot: its id, then each of its colours after a hyphen, as
@@ -25,8 +27,8 @@ six lowercase hex digits. The text uses only lowercase letters, digits, dots and
 goes into a URL, a JSON value or a file name as it is.
 
 - `v1` alone is the plain avatar: the face and eyes, each in its own colour.
-- An avatar has one part in each slot: `face`, `eyes`, `hair`. A later part in a slot replaces
-  an earlier one. A new slot joins at the end.
+- An avatar has one part in each slot: `face`, `eyes`, `hair`, `eyewear`. A later part in a
+  slot replaces an earlier one. A new slot joins at the end.
 - `formatAvatar` writes the one string for an avatar: its parts in the slots' order, each with
   every colour. A string written by hand may leave colours out and list parts in any order.
 - A string keeps drawing the same avatar: a part's id and drawing are permanent, and its colours
@@ -71,7 +73,8 @@ reduced motion. All the avatars in a page share one clock, which moves them 30 t
 redraws an avatar only when it would change by a quarter of a screen pixel. A picture is a
 square that fits its figure, so an avatar with full hair is drawn a little smaller.
 
-A seed chooses a face and eyes; hair is put on by a string, as `waves`, `mane`, `sweep` or `sides`.
+A seed chooses a face and eyes; hair is put on by a string, as `waves`, `mane`, `sweep` or `sides`,
+and glasses as `specs`.
 
 `parseAvatar` reads a string into its settings and throws `AvatarStringError` for text that is
 not one; `formatAvatar` writes settings back. `PARTS` and `SLOTS` list the catalog, for an editor.
@@ -87,7 +90,8 @@ The head's outline does not turn: it shifts and leans a little the same way.
 That one rule gives each kind of thing its view of a turn:
 
 - The eyes lie on the face, so the eye ahead closes on the edge and thins while the one behind
-  crosses the middle. Whatever else lies on the face keeps its place beside them.
+  crosses the middle. Glasses lie on the face too: each rim goes with its eye and narrows with
+  it, and the arm on the side turned toward us lengthens.
 - Hair is a shape whose rim stays with the head's outline and whose hairline lies on the face.
   In a turn the hairline goes with the face, so the hair between rim and hairline widens on the
   side turned toward us and thins on the side turned away, as the side of a head comes into
