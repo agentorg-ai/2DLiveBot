@@ -1,0 +1,139 @@
+name: Publish
+
+# A release is a version in package.json that reaches main and is not on npm yet: this workflow
+# publishes it and tags the commit. A push that leaves the version as it is publishes nothing.
+#
+# Run by hand, or for a pull request that changes the version or this file, it rehearses instead:
+# everything but the publish, with a list of what would ship.
+#
+# The publish signs in to npm through trusted publishing: npm trusts this file in this repository,
+# in the environment named below, so the repository holds no npm token.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths: [package.json, .github/workflows/publish.yml]
+  workflow_dispatch:
+
+permissions: {}
+
+# One run at a time for a branch, so that a second push reads the registry after the first has
+# published.
+concurrency:
+  group: publish-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  state:
+    name: Version and registry
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.read.outputs.version }}
+      new: ${{ steps.read.outputs.new }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Read the version and ask the registry for it
+        id: read
+        run: |
+          name=$(jq -r .name package.json)
+          version=$(jq -r .version package.json)
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::Not a version: $version"
+            exit 1
+          fi
+          code=$(curl -sS -o /dev/null -w '%{http_code}' "https://registry.npmjs.org/$name/$version")
+          case "$code" in
+            200) new=false; said="is already on npm" ;;
+            404) new=true; said="is not on npm yet" ;;
+            *)
+              echo "::error::The registry answered $code for $name@$version"
+              exit 1
+              ;;
+          esac
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "new=$new" >> "$GITHUB_OUTPUT"
+          echo "$name@$version $said." | tee -a "$GITHUB_STEP_SUMMARY"
+
+  rehearse:
+    name: Rehearse, publishing nothing
+    needs: state
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Install
+        run: npm ci
+      - name: Do everything but the publish
+        env:
+          NEW: ${{ needs.state.outputs.new }}
+        run: |
+          if [ "$NEW" = true ]; then
+            npm publish --dry-run
+          else
+            echo "This version is already on npm, so a push to main would publish nothing. The package would hold:"
+            npm pack --dry-run
+          fi
+
+  publish:
+    name: Publish to npm
+    needs: state
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      github.repository == 'agentorg-ai/2DLiveBot' &&
+      needs.state.outputs.new == 'true'
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - name: Check that this npm can publish without a token
+        run: |
+          node -e '
+            const [major, minor, patch] = process.argv[1].split(".").map(Number);
+            const enough = major > 11 || (major === 11 && (minor > 5 || (minor === 5 && patch >= 1)));
+            console.log(`npm ${process.argv[1]}`);
+            if (!enough) {
+              console.error("::error::Trusted publishing needs npm 11.5.1 or later");
+              process.exit(1);
+            }
+          ' "$(npm --version)"
+      - name: Install
+        run: npm ci
+      # `prepack` builds and tests first, so a failure there publishes nothing.
+      - name: Publish
+        run: npm publish
+
+  tag:
+    name: Tag the commit
+    needs: [state, publish]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Tag the published commit with its version
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.state.outputs.version }}
+        run: gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/v$VERSION" -f sha="$GITHUB_SHA"

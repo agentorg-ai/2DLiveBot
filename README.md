@@ -154,8 +154,19 @@ avatars from seeds. `?many=50` shows that many avatars and nothing else, and `&v
 string makes them all that avatar. `npm run demo -- --build` builds the page into `dist/page`
 and stops.
 
-`npm publish` builds and tests first, so what it sends is always made from the files it is run
-on.
+## Release
+
+A release is a change to `version` in `package.json` that reaches `main`. The Publish workflow
+then builds, tests and publishes that version to npm as `@agentorg/2dlivebot`, and tags the commit
+`v` and the version. A push that leaves the version as it is publishes nothing, and a build or
+test that fails publishes nothing.
+
+For a pull request that changes the version, and when run by hand from the Actions tab, the
+workflow rehearses: it does everything but the publish and lists what would ship.
+
+The workflow signs in to npm through
+[trusted publishing](https://docs.npmjs.com/trusted-publishers), so the repository holds no npm
+token.
 
 ## License
 
