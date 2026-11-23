@@ -1,10 +1,11 @@
 // A live avatar in a page: an SVG element built from the avatar's string, moved by one clock all
 // the page's avatars share. It is made with DOM calls and moved through SVG attributes, so it
 // works under a content policy that allows neither inline styles nor code from text.
-import { type Drawing, draw, type Group } from "./draw.ts";
+import { type Drawing, type Drawn, draw } from "./draw.ts";
 import { hash } from "./hash.ts";
 import { type Aim, createMotion, type Motion, type State, settled } from "./motion.ts";
-import { REST, transformOf } from "./pose.ts";
+import { pathText } from "./path.ts";
+import { headTransform, mover, REST, turnOf } from "./pose.ts";
 import { avatarFromSeed } from "./seed.ts";
 import { type Avatar, parseAvatar } from "./string.ts";
 
@@ -35,7 +36,11 @@ export type Mounted = {
 
 type Live = {
   svg: SVGSVGElement;
-  groups: { element: SVGGElement; group: Group; transform: string }[];
+  /** The group that holds every shape and carries the head's shift, tilt and breath. */
+  head: SVGGElement;
+  transform: string;
+  /** The shapes that have something on the face, each with the turn it was last drawn at. */
+  turning: { element: SVGPathElement; drawn: Drawn; key: string }[];
   /** The smallest movement worth making, in drawing units: a quarter of a screen pixel. */
   step: number;
   motion: Motion;
@@ -80,13 +85,22 @@ function settle(live: Live) {
   }
 }
 
+/** A turn that has not turned, which is how every shape is first drawn. */
+const AHEAD = turnOf(REST, true).key;
+
 function pose(live: Live, at: typeof REST) {
-  for (const item of live.groups) {
-    const transform = transformOf(item.group, at, live.step);
-    if (transform === item.transform) continue;
-    item.transform = transform;
-    if (transform) item.element.setAttribute("transform", transform);
-    else item.element.removeAttribute("transform");
+  const transform = headTransform(at, live.step);
+  if (transform !== live.transform) {
+    live.transform = transform;
+    if (transform) live.head.setAttribute("transform", transform);
+    else live.head.removeAttribute("transform");
+  }
+  const [face, eyes] = [turnOf(at, false, live.step), turnOf(at, true, live.step)];
+  for (const item of live.turning) {
+    const turn = item.drawn.eye ? eyes : face;
+    if (turn.key === item.key) continue;
+    item.key = turn.key;
+    item.element.setAttribute("d", pathText(item.drawn.segments, mover(turn, item.drawn.eye)));
   }
 }
 
@@ -161,16 +175,16 @@ const read = (options: Options): Avatar => {
 
 function build(live: Live, drawing: Drawing) {
   live.svg.setAttribute("viewBox", drawing.viewBox);
-  live.groups = drawing.groups.map((group) => {
-    const element = document.createElementNS(SVG, "g");
-    for (const shape of group.shapes) {
-      const path = document.createElementNS(SVG, "path");
-      for (const [name, value] of Object.entries(shape)) path.setAttribute(name, value);
-      element.append(path);
-    }
-    return { element, group, transform: "" };
-  });
-  live.svg.replaceChildren(...live.groups.map((item) => item.element));
+  live.turning = [];
+  live.head.replaceChildren(
+    ...drawing.shapes.map((drawn) => {
+      const element = document.createElementNS(SVG, "path");
+      element.setAttribute("d", pathText(drawn.segments));
+      for (const [name, value] of Object.entries(drawn.paint)) element.setAttribute(name, value);
+      if (drawn.turns) live.turning.push({ element, drawn, key: AHEAD });
+      return element;
+    }),
+  );
 }
 
 /** Put a live avatar in an element. It starts moving at once, and stops by itself while it is
@@ -179,9 +193,12 @@ export function mount(target: Element, options: Options): Mounted {
   listen();
   const svg = document.createElementNS(SVG, "svg");
   svg.style.display = "block";
+  const head = svg.appendChild(document.createElementNS(SVG, "g"));
   const live: Live = {
     svg,
-    groups: [],
+    head,
+    transform: "",
+    turning: [],
     step: 0.01,
     motion: createMotion(hash(options.value ?? options.seed ?? "")),
     state: "idle",
