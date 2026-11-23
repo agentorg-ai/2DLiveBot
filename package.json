@@ -1,5 +1,5 @@
 {
-  "name": "2dlivebot",
+  "name": "@agentorg/2dlivebot",
   "version": "0.1.0",
   "description": "Animated 2D character avatars for the web, each drawn from one string and alive in the page.",
   "license": "MIT",

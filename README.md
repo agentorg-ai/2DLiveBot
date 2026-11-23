@@ -39,11 +39,11 @@ goes into a URL, a JSON value or a file name as it is.
 ## Use
 
 ```
-npm install 2dlivebot
+npm install @agentorg/2dlivebot
 ```
 
 ```ts
-import { avatarFromSeed, mount, toSvg } from "2dlivebot";
+import { avatarFromSeed, mount, toSvg } from "@agentorg/2dlivebot";
 
 // Live, in an element. The avatar of a seed, such as a user's id, is always the same.
 const avatar = mount(element, { seed: user.id, size: 40 });
@@ -55,7 +55,7 @@ image.src = `data:image/svg+xml,${encodeURIComponent(toSvg(avatarFromSeed(user.i
 ```
 
 ```tsx
-import { Avatar } from "2dlivebot/react";
+import { Avatar } from "@agentorg/2dlivebot/react";
 
 <Avatar seed={user.id} size={40} state="working" label={user.name} />;
 ```
