@@ -1,9 +1,21 @@
 {
   "name": "2dlivebot",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
   "description": "Animated 2D character avatars for the web, each drawn from one string and alive in the page.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/agentorg-ai/2DLiveBot.git"
+  },
+  "homepage": "https://github.com/agentorg-ai/2DLiveBot#readme",
+  "bugs": "https://github.com/agentorg-ai/2DLiveBot/issues",
+  "keywords": [
+    "avatar",
+    "svg",
+    "animation",
+    "character",
+    "react"
+  ],
   "type": "module",
   "engines": {
     "node": ">=22.15"
@@ -22,11 +34,15 @@
   "files": [
     "dist/src"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.json && tsc -p tsconfig.test.json",
     "test": "node --test --test-timeout=60000 \"dist/test/**/*.test.js\"",
     "check": "biome check .",
-    "demo": "node scripts/demo.js"
+    "demo": "node scripts/demo.js",
+    "prepack": "npm run build && npm test"
   },
   "peerDependencies": {
     "react": ">=18"

@@ -10,7 +10,7 @@ SVG with DOM calls and moves it through SVG attributes, so it works under a cont
 allows neither inline styles nor code from text.
 
 This is a prototype: the face, the eyes, four hair styles, each flat and known by its
-outline, and a pair of glasses. It is not on npm yet.
+outline, and a pair of glasses.
 
 ![The four hair styles, each front on and looking left, right and down](docs/hair.png)
 
@@ -37,6 +37,10 @@ goes into a URL, a JSON value or a file name as it is.
   ignored, so a string made with a later catalog still draws with an earlier one.
 
 ## Use
+
+```
+npm install 2dlivebot
+```
 
 ```ts
 import { avatarFromSeed, mount, toSvg } from "2dlivebot";
@@ -144,6 +148,9 @@ parts, the colours and where the avatar looks, a sheet of that avatar turned eac
 avatars from seeds. `?many=50` shows that many avatars and nothing else, and `&value=` with a
 string makes them all that avatar. `npm run demo -- --build` builds the page into `dist/page`
 and stops.
+
+`npm publish` builds and tests first, so what it sends is always made from the files it is run
+on.
 
 ## License
 
