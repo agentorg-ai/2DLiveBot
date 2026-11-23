@@ -11,12 +11,12 @@ test("v1 alone is the plain avatar: a face and eyes, each with its own colour", 
 });
 
 test("an avatar has one string: parts in the slots' order, each with every colour", () => {
-  const one = "v1.round-e9c09c.dot-3a2f5b.waves-b4513a";
+  const one = "v1.round-e9c09c.dot-3a2f5b.waves-b4513a.specs-7a4a35";
   assert.equal(formatAvatar(parseAvatar(one)), one);
   // Written by hand: out of order, colours left out.
   assert.equal(
-    formatAvatar(parseAvatar("v1.waves.round-e9c09c")),
-    "v1.round-e9c09c.dot-2a2530.waves-5b3a2c",
+    formatAvatar(parseAvatar("v1.specs.waves.round-e9c09c")),
+    "v1.round-e9c09c.dot-2a2530.waves-5b3a2c.specs-2a2530",
   );
 });
 

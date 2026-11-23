@@ -107,6 +107,21 @@ test("as the head turns, what lies on the face travels round it and narrows towa
   assert.ok(Math.abs(other[0] - (100 - far[0])) < 0.01 && Math.abs(other[1] - far[1]) < 0.01);
 });
 
+test("a rim of the glasses stays about its eye through a turn, and narrows with it", () => {
+  const turned = settled({ x: 1, y: 0 });
+  // The far eye's rim: its left, right, top and bottom, as far from the eye's middle as a rim
+  // reaches across and down.
+  const [across, down] = [10.8, 9.8];
+  const eye = placed(turned, 66.5, 60);
+  const [left, right] = [placed(turned, 66.5 - across, 60), placed(turned, 66.5 + across, 60)];
+  const [top, bottom] = [placed(turned, 66.5, 60 - down), placed(turned, 66.5, 60 + down)];
+  assert.ok(left[0] < eye[0] && eye[0] < right[0] && top[1] < eye[1] && eye[1] < bottom[1]);
+  const [wide, tall] = [right[0] - left[0], bottom[1] - top[1]];
+  assert.ok(wide < across * 2 * 0.95, "it is narrower than it is drawn");
+  assert.ok(wide / tall < across / down, "and narrower for its height than it is drawn");
+  assert.ok(Math.hypot((right[0] - 50) / 38, (right[1] - 55.5) / 33) < 1, "and on the face");
+});
+
 test("a hairline goes with the face while the hair's rim stays: the lock ahead thins, the other widens", () => {
   // Two locks of hair at eye level: their rims at 9 and 91, their hairlines at 19 and 81.
   const turned = settled({ x: 1, y: 0 });
