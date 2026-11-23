@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { avatarFromSeed, parseAvatar } from "../src/index.ts";
 
-test("a seed's avatar is the same on every machine and in every release", () => {
+test("a seed's avatar is the same on every machine, and changes with a version only on purpose", () => {
   // Written out, so that a change to how a seed chooses fails here.
   assert.deepEqual(
     ["", "release-notes", "agent-1", "7f3a9c2e-1b4d-4e8a-9c0f-2d6b5a8e1f37"].map(avatarFromSeed),

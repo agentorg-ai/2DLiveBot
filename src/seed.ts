@@ -1,5 +1,6 @@
 // An avatar for anything with a name: the same seed makes the same avatar's string, so an agent
-// has a face before anyone chooses one.
+// has a face before anyone chooses one. That holds within one version of the library: a later
+// version may choose differently, and the string a seed made keeps drawing the same avatar.
 import { hash, random } from "./hash.ts";
 import { SLOTS, type Slot } from "./part.ts";
 import { type Avatar, formatAvatar } from "./string.ts";

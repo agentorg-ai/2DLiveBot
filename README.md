@@ -46,7 +46,7 @@ npm install @agentorg/2dlivebot
 ```ts
 import { avatarFromSeed, mount, toSvg } from "@agentorg/2dlivebot";
 
-// Live, in an element. The avatar of a seed, such as a user's id, is always the same.
+// Live, in an element. A seed, such as a user's id, makes the same avatar every time.
 const avatar = mount(element, { seed: user.id, size: 40 });
 avatar.update({ value: "v1.round-e9c09c.dot-2a2530.waves-2d2630", size: 40 });
 avatar.remove();
@@ -82,6 +82,10 @@ A seed chooses every part: a skin tone, the eyes' colour, one of the hair styles
 `sweep`, `sides`) or, for one head in twelve, none, a hair colour, and glasses (`specs`) for three
 avatars in ten. Hair and frames are never a colour close to the skin's. `avatarFromSeed` returns
 the string, so an avatar picked at random is the string of a random seed.
+
+A seed makes the same avatar on every machine in one version of the library. A later version may
+choose differently for some seeds. A string never changes what it draws, so an avatar that must
+stay as it is is kept as its string.
 
 ![Sixty avatars, each made from a different seed](docs/seeds.png)
 
