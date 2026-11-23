@@ -9,10 +9,10 @@ The library has no dependencies and loads nothing: every drawing is in its code.
 SVG with DOM calls and moves it through SVG attributes, so it works under a content policy that
 allows neither inline styles nor code from text.
 
-This is a prototype: the face, the eyes, and six hair styles, each flat and known by its
+This is a prototype: the face, the eyes, and four hair styles, each flat and known by its
 outline. It is not on npm yet.
 
-![The six hair styles, each front on and looking left, right and down](docs/hair.png)
+![The four hair styles, each front on and looking left, right and down](docs/hair.png)
 
 ## The avatar's string
 
@@ -71,8 +71,7 @@ reduced motion. All the avatars in a page share one clock, which moves them 30 t
 redraws an avatar only when it would change by a quarter of a screen pixel. A picture is a
 square that fits its figure, so an avatar with full hair is drawn a little smaller.
 
-A seed chooses a face and eyes; hair is put on by a string, as `waves`, `mane`, `sweep`, `buzz`,
-`mohican` or `sides`.
+A seed chooses a face and eyes; hair is put on by a string, as `waves`, `mane`, `sweep` or `sides`.
 
 `parseAvatar` reads a string into its settings and throws `AvatarStringError` for text that is
 not one; `formatAvatar` writes settings back. `PARTS` and `SLOTS` list the catalog, for an editor.

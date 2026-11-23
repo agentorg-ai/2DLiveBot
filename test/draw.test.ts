@@ -49,7 +49,7 @@ test("every hair is flat shapes whose rim stays and whose hairline is on the fac
   const styles = PARTS.filter((part) => part.slot === "hair");
   assert.deepEqual(
     styles.map((part) => part.id),
-    ["waves", "mane", "sweep", "buzz", "mohican", "sides"],
+    ["waves", "mane", "sweep", "sides"],
   );
   for (const part of styles) {
     const [behind, over] = [

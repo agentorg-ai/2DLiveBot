@@ -33,11 +33,11 @@ const SEEDS = [
 /** Avatars with hair, which seeds do not choose yet. */
 const DRESSED = [
   "v1.round-f7e3cf.dot-2a2530.sides-4a3128",
-  "v1.round-e9c09c.dot-2a2530.mohican-2d2630",
-  "v1.round-d2a078.dot-2a2530.buzz-2d2630",
   "v1.round-e9c09c.dot-2a2530.sweep-2d2630",
   "v1.round-f7e3cf.dot-2a2530.mane-9d99a4",
   "v1.round-f7e3cf.dot-2a2530.waves-5b3a2c",
+  "v1.round-d2a078.dot-2a2530.sweep-a0673c",
+  "v1.round-ab7852.dot-2a2530.waves-2d2630",
 ];
 const STATES: State[] = ["idle", "working", "asleep"];
 const ACROSS = [-1, -0.66, -0.33, 0, 0.33, 0.66, 1];
