@@ -39,6 +39,12 @@ const DEGREES = Math.PI / 180;
  * is wider than the head, whose face is the ball's shallow front, so that what lies near the
  * head's edge still has room to travel and a hairline keeps a smooth line as it goes. */
 const BALL = { x: 50, y: 55.5, rx: 45, ry: 40 } as const;
+/** The head's outline as an oval about the ball's middle: how far it reaches across and down.
+ * What lies on the face turns with the ball in full as far as `INNER` of the way out to the
+ * outline, then less and less, and at the outline not at all. So a hairline never crosses the
+ * head's edge, and where it meets the edge it stays put. */
+const OUTLINE = { rx: 38, ry: 33 } as const;
+const INNER = 0.7;
 /** The furthest the head turns and the eyes turn beyond it, across and down, in radians. */
 const HEAD = [22 * DEGREES, 16 * DEGREES] as const;
 const EYES = [9 * DEGREES, 7 * DEGREES] as const;
@@ -95,22 +101,30 @@ export function mover(
   const [sinA, cosA] = [Math.sin(turn.across), Math.cos(turn.across)];
   const [sinD, cosD] = [Math.sin(turn.down), Math.cos(turn.down)];
   const onBall = (x: number, y: number): readonly [number, number] => {
-    let [u, v] = [(x - BALL.x) / BALL.rx, (y - BALL.y) / BALL.ry];
-    // A point off the ball is carried by the nearest point of its edge.
-    const far = Math.max(1, Math.hypot(u, v));
-    [u, v] = [u / far, v / far];
-    const [offX, offY] = [x - (BALL.x + BALL.rx * u), y - (BALL.y + BALL.ry * v)];
+    // What is at the head's edge, or outside it, stays where it is.
+    const out = Math.hypot((x - BALL.x) / OUTLINE.rx, (y - BALL.y) / OUTLINE.ry);
+    if (out >= 1) return [x, y];
+    const [u, v] = [(x - BALL.x) / BALL.rx, (y - BALL.y) / BALL.ry];
     const w = Math.sqrt(Math.max(0, 1 - u * u - v * v));
     // Turned across, then down.
-    let across = u * cosA + w * sinA;
-    const depth = w * cosA - u * sinA;
-    let down = v * cosD + depth * sinD;
-    // A point turned out of sight stays at the edge it went round.
-    if (depth * cosD - v * sinD < 0) {
-      const reach = Math.hypot(across, down) || 1;
-      [across, down] = [across / reach, down / reach];
-    }
-    return [BALL.x + BALL.rx * across + offX, BALL.y + BALL.ry * down + offY];
+    const across = u * cosA + w * sinA;
+    const down = v * cosD + (w * cosA - u * sinA) * sinD;
+    // Near the edge a point takes less of the turn, easing to none at the edge itself.
+    const near = Math.max(0, (out - INNER) / (1 - INNER));
+    const share = 1 - near * near * (3 - 2 * near);
+    const [mx, my] = [
+      (BALL.x + BALL.rx * across - x) * share,
+      (BALL.y + BALL.ry * down - y) * share,
+    ];
+    // And it goes no further than the edge: this much of its move takes it there.
+    const [px, py] = [(x - BALL.x) / OUTLINE.rx, (y - BALL.y) / OUTLINE.ry];
+    const [qx, qy] = [mx / OUTLINE.rx, my / OUTLINE.ry];
+    const [along, length] = [px * qx + py * qy, qx * qx + qy * qy];
+    const most = length
+      ? (Math.sqrt(along * along + length * (1 - out * out)) - along) / length
+      : 1;
+    const kept = Math.min(1, most);
+    return [x + mx * kept, y + my * kept];
   };
   if (!eye) return onBall;
   const middle = onBall(eye[0], eye[1])[1];

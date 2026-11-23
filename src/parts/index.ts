@@ -2,9 +2,10 @@
 import type { Part, Slot } from "../part.ts";
 import { dot } from "./eyes/dot.ts";
 import { round } from "./face/round.ts";
+import { mane } from "./hair/mane.ts";
 import { waves } from "./hair/waves.ts";
 
-export const PARTS: readonly Part[] = [round, dot, waves];
+export const PARTS: readonly Part[] = [round, dot, waves, mane];
 
 const byId = new Map(PARTS.map((part) => [part.id, part]));
 export const partOf = (id: string): Part | undefined => byId.get(id);

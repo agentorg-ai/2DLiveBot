@@ -111,8 +111,25 @@ test("a hairline goes with the face while the hair's rim stays: the lock ahead t
   // Two locks of hair at eye level: their rims at 9 and 91, their hairlines at 19 and 81.
   const turned = settled({ x: 1, y: 0 });
   const [left, right] = [placed(turned, 19, 56.5)[0], placed(turned, 81, 56.5)[0]];
-  assert.ok(left - 9 > (19 - 9) * 1.8, "the lock we turn away from widens");
+  assert.ok(left - 9 > (19 - 9) * 1.5, "the lock we turn away from widens");
   assert.ok(91 - right < (91 - 81) * 0.5 && right < 91, "the lock ahead thins, inside its rim");
+});
+
+test("nothing on the face crosses the head's edge, and what is at the edge stays", () => {
+  const inside = (x: number, y: number) => Math.hypot((x - 50) / 38, (y - 55.5) / 33);
+  for (const look of [
+    { x: 1, y: 0 },
+    { x: -1, y: 1 },
+    { x: 1, y: -1 },
+  ]) {
+    // The furthest the face ever turns: all the way, and the little past it a spring goes.
+    const move = mover(turnOf({ ...REST, turnX: look.x * 1.1, turnY: look.y * 1.1 }, false));
+    for (let x = 12; x <= 88; x += 4)
+      for (let y = 23; y <= 88; y += 5) {
+        if (inside(x, y) >= 1) assert.deepEqual(move(x, y), [x, y]);
+        else assert.ok(inside(...move(x, y)) <= 1 + 1e-9, `${x} ${y} looking ${look.x} ${look.y}`);
+      }
+  }
 });
 
 test("looking down, what lies on the face drops; the head itself only shifts and leans", () => {

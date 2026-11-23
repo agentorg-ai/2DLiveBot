@@ -9,8 +9,10 @@ The library has no dependencies and loads nothing: every drawing is in its code.
 SVG with DOM calls and moves it through SVG attributes, so it works under a content policy that
 allows neither inline styles nor code from text.
 
-This is a prototype: the face, the eyes, and one hair style, which shows how hair follows a
-turn of the head. It is not on npm yet.
+This is a prototype: the face, the eyes, and two hair styles, each flat and known by its
+outline. More are being added one at a time. It is not on npm yet.
+
+![The two hair styles, each front on and looking left, right and down](docs/hair.png)
 
 ## The avatar's string
 
@@ -69,7 +71,7 @@ reduced motion. All the avatars in a page share one clock, which moves them 30 t
 redraws an avatar only when it would change by a quarter of a screen pixel. A picture is a
 square that fits its figure, so an avatar with full hair is drawn a little smaller.
 
-A seed chooses a face and eyes; hair is put on by a string.
+A seed chooses a face and eyes; hair is put on by a string, as `waves` or `mane`.
 
 `parseAvatar` reads a string into its settings and throws `AvatarStringError` for text that is
 not one; `formatAvatar` writes settings back. `PARTS` and `SLOTS` list the catalog, for an editor.
@@ -79,7 +81,8 @@ not one; `formatAvatar` writes settings back. `PARTS` and `SLOTS` list the catal
 The drawing is flat, and the head turns all the same. The face is treated as the shallow front
 of a ball. When the head turns, every point that lies on the face travels round the ball: it
 goes toward the side the head turns to, slows as it nears the edge, and what is drawn there
-narrows. The head's outline does not turn: it shifts and leans a little the same way.
+narrows. What is at the head's edge stays where it is, so nothing on the face ever crosses it.
+The head's outline does not turn: it shifts and leans a little the same way.
 
 That one rule gives each kind of thing its view of a turn:
 

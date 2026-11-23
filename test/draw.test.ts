@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { draw } from "../src/draw.ts";
-import { face, parseAvatar, toSvg } from "../src/index.ts";
+import { face, PARTS, parseAvatar, toSvg } from "../src/index.ts";
 import { pathText, segmentsOf } from "../src/path.ts";
 
 const haired = "v1.round-e9c09c.dot-3a2f5b.waves-b4513a";
@@ -45,14 +45,24 @@ test("a shape turns when some of it lies on the face, and an eye lies on it whol
   );
 });
 
-test("hair is one shape whose rim stays and whose hairline is on the face", () => {
-  const hair = draw(parseAvatar(haired)).shapes.at(-1);
-  assert.ok(hair);
-  const onFace = hair.segments.map((segment) => segment.face);
-  // A run of rim, a run of hairline, and the rim again to close.
-  const runs = onFace.filter((on, i) => on !== onFace[i - 1]);
-  assert.deepEqual(runs, [false, true, false]);
-  assert.equal(hair.segments.at(-1)?.command, "Z");
+test("every hair is one shape over the head whose rim stays and whose hairline is on the face", () => {
+  const styles = PARTS.filter((part) => part.slot === "hair");
+  assert.deepEqual(
+    styles.map((part) => part.id),
+    ["waves", "mane"],
+  );
+  for (const part of styles) {
+    const hair = draw(parseAvatar(`v1.${part.id}`)).shapes.at(-1);
+    assert.ok(hair, part.id);
+    const onFace = hair.segments.map((segment) => segment.face);
+    // A run of rim, a run of hairline, and the rim again to close.
+    const runs = onFace.filter((on, i) => on !== onFace[i - 1]);
+    assert.deepEqual(runs, [false, true, false], part.id);
+    assert.equal(hair.segments.at(-1)?.command, "Z", part.id);
+    // One flat colour: every shape of the hair is filled with it and has no line.
+    for (const shape of part.layers.flatMap((layer) => layer.shapes))
+      assert.deepEqual([shape.fill, shape.stroke], ["0", undefined], part.id);
+  }
 });
 
 test("a path is read stretch by stretch, and written back as it was drawn", () => {
