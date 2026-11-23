@@ -9,13 +9,13 @@ test("a seed's avatar is the same on every machine and in every release", () => 
     [
       "v1.round-f4d6b8.dot-2a2530.mane-4a3128",
       "v1.round-ab7852.dot-2a2530.mane-5b3a2c",
-      "v1.round-ab7852.dot-3b2a22.mane-453c4d.specs-7d2f3a",
+      "v1.round-ab7852.dot-3b2a22.mane-453c4d",
       "v1.round-80533a.dot-2a2530.waves-c2703d.specs-2a2530",
     ],
   );
 });
 
-const made = Array.from({ length: 600 }, (_, i) => parseAvatar(avatarFromSeed(`agent-${i}`)));
+const made = Array.from({ length: 5000 }, (_, i) => parseAvatar(avatarFromSeed(`agent-${i}`)));
 const share = (count: number) => count / made.length;
 
 test("seeds spread over every slot: skins, hair styles and colours, and glasses for some", () => {
@@ -32,7 +32,7 @@ test("seeds spread over every slot: skins, hair styles and colours, and glasses 
   const bald = share(made.filter((avatar) => !avatar.hair).length);
   assert.ok(bald > 0.03 && bald < 0.15, `${bald} of heads are bald`);
   const glasses = share(made.filter((avatar) => avatar.eyewear).length);
-  assert.ok(glasses > 0.17 && glasses < 0.33, `${glasses} wear glasses`);
+  assert.ok(glasses > 0.18 && glasses < 0.22, `${glasses} wear glasses`);
 });
 
 test("a seed's hair and frames are never a colour close to its skin's", () => {

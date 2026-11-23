@@ -28,9 +28,9 @@ const CHOICES: Record<Slot, { parts: readonly (string | null)[]; colors: readonl
       ],
     ],
   },
-  // One avatar in four wears glasses.
+  // One avatar in five wears glasses.
   eyewear: {
-    parts: ["specs", null, null, null],
+    parts: ["specs", null, null, null, null],
     colors: [["2a2530", "2a2530", "7a4a35", "7d2f3a", "2f4468"]],
   },
 };
