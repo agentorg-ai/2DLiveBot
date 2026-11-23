@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Avatars</title>
+    <link rel="stylesheet" href="demo.css" />
+    <script type="module" src="demo.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1>Avatars</h1>
+      <button id="theme" type="button">Switch page colour</button>
+    </header>
+    <main>
+      <section class="editor">
+        <div class="stage">
+          <div id="big"></div>
+          <div id="small" class="row"></div>
+        </div>
+        <div class="controls">
+          <div id="slots"></div>
+          <div class="field">
+            <label for="state">State</label>
+            <select id="state">
+              <option>idle</option>
+              <option>working</option>
+              <option>asleep</option>
+            </select>
+            <label><input id="still" type="checkbox" /> Still</label>
+          </div>
+          <div class="field">
+            <label for="follow">Look</label>
+            <label><input id="follow" type="checkbox" checked /> By itself, and at the pointer</label>
+          </div>
+          <div class="field">
+            <label for="look-x">Across</label>
+            <input id="look-x" type="range" min="-1" max="1" step="0.05" value="0" disabled />
+          </div>
+          <div class="field">
+            <label for="look-y">Down</label>
+            <input id="look-y" type="range" min="-1" max="1" step="0.05" value="0" disabled />
+          </div>
+          <div class="field">
+            <label for="string">String</label>
+            <input id="string" type="text" spellcheck="false" autocomplete="off" />
+          </div>
+          <p id="problem" role="status"></p>
+          <div class="field">
+            <label for="seed">Seed</label>
+            <input id="seed" type="text" placeholder="an agent's id" autocomplete="off" />
+            <button id="random" type="button">Random</button>
+          </div>
+        </div>
+      </section>
+      <section>
+        <h2>Turning: each looks one way, from left to right and from up to down</h2>
+        <div id="turning"></div>
+      </section>
+      <section>
+        <h2>Face shapes</h2>
+        <div id="shapes" class="row"></div>
+      </section>
+      <section>
+        <h2>From seeds</h2>
+        <div id="seeded" class="grid"></div>
+      </section>
+      <section>
+        <h2>Small: 20, 28, 40 and 64 pixels</h2>
+        <div id="sizes" class="row"></div>
+      </section>
+      <section>
+        <h2>States: idle, working, asleep</h2>
+        <div id="states" class="row"></div>
+      </section>
+      <section>
+        <h2>Still, as images</h2>
+        <div id="images" class="row"></div>
+      </section>
+      <section>
+        <h2>As a React component</h2>
+        <div id="react"></div>
+      </section>
+    </main>
+  </body>
+</html>

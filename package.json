@@ -1,0 +1,49 @@
+{
+  "name": "2dlivebot",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Animated 2D character avatars for the web, each drawn from one string and alive in the page.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.15"
+  },
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    },
+    "./react": {
+      "types": "./dist/src/react.d.ts",
+      "default": "./dist/src/react.js"
+    }
+  },
+  "files": [
+    "dist/src"
+  ],
+  "scripts": {
+    "build": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.json && tsc -p tsconfig.test.json",
+    "test": "node --test --test-timeout=60000 \"dist/test/**/*.test.js\"",
+    "check": "biome check .",
+    "demo": "node scripts/demo.js"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.6.5",
+    "@types/node": "22.20.5",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "esbuild": "0.28.2",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "typescript": "7.0.2"
+  }
+}

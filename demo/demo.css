@@ -1,0 +1,182 @@
+:root {
+  color-scheme: light;
+  --page: #f6f5f2;
+  --panel: #ffffff;
+  --line: #dedbd3;
+  --text: #24222a;
+  --quiet: #6d6a75;
+  --bad: #b3261e;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #17161b;
+    --panel: #212026;
+    --line: #36343d;
+    --text: #eceaf0;
+    --quiet: #a3a0ad;
+    --bad: #f2b8b5;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #17161b;
+  --panel: #212026;
+  --line: #36343d;
+  --text: #eceaf0;
+  --quiet: #a3a0ad;
+  --bad: #f2b8b5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0 16px 48px;
+  background: var(--page);
+  color: var(--text);
+  font:
+    15px / 1.5 system-ui,
+    sans-serif;
+}
+
+header,
+main {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0 12px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 20px;
+}
+
+h2 {
+  margin: 28px 0 10px;
+  color: var(--quiet);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+button,
+select,
+input[type="text"] {
+  padding: 5px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: inherit;
+  font: inherit;
+}
+
+input[type="color"] {
+  width: 34px;
+  height: 30px;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.editor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--panel);
+}
+
+.stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.controls {
+  flex: 1;
+  min-width: 280px;
+}
+
+.field {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.field > label:first-child {
+  width: 64px;
+  color: var(--quiet);
+}
+
+.field input[type="text"] {
+  flex: 1;
+  min-width: 0;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 13px;
+}
+
+#problem {
+  min-height: 1.5em;
+  margin: 0 0 8px 72px;
+  color: var(--bad);
+  font-size: 13px;
+}
+
+.row,
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 14px;
+}
+
+.grid button {
+  padding: 6px;
+  border-color: transparent;
+  background: none;
+  cursor: pointer;
+}
+
+.grid button:hover {
+  border-color: var(--line);
+  background: var(--panel);
+}
+
+.many {
+  max-width: none;
+  gap: 8px;
+  padding-top: 16px;
+}
+
+input[type="range"] {
+  flex: 1;
+  min-width: 0;
+  max-width: 260px;
+}
+
+#turning .row {
+  margin-bottom: 6px;
+}
+
+figure {
+  margin: 0;
+  color: var(--quiet);
+  font-size: 13px;
+  text-align: center;
+}
