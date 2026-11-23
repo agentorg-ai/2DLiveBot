@@ -18,7 +18,7 @@ export const buzz: Part = {
             // The hairline: one arch, up the right sideburn, across the brow, and down the
             // left.
             face(
-              "C86.2 53.5 83.5 47.5 79 43C72 37 61.5 34.5 50 34.5C38.5 34.5 28 37 21 43C16.5 47.5 13.8 53.5 12.9 58",
+              "C86.4 55 84 50.5 80 47C73 41.5 62 39.5 50 39.5C38 39.5 27 41.5 20 47C16 50.5 13.8 55 12.9 58.5",
             ),
             "L12.4 60Z",
           ],
