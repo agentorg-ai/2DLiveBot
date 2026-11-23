@@ -6,8 +6,9 @@ name: Publish
 # Run by hand, or for a pull request that changes the version or this file, it rehearses instead:
 # everything but the publish, with a list of what would ship.
 #
-# The publish signs in to npm through trusted publishing: npm trusts this file in this repository,
-# in the environment named below, so the repository holds no npm token.
+# The publish signs in to npm through trusted publishing: npm trusts this file, by its name, in
+# this repository, so the repository holds no npm token. Renaming the file, or giving the publish
+# job an environment, breaks that until npm is told the new one.
 on:
   push:
     branches: [main]
@@ -95,7 +96,6 @@ jobs:
       github.repository == 'agentorg-ai/2DLiveBot' &&
       needs.state.outputs.new == 'true'
     runs-on: ubuntu-latest
-    environment: npm
     permissions:
       contents: read
       id-token: write
