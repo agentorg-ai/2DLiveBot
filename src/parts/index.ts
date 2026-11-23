@@ -4,10 +4,11 @@ import { dot } from "./eyes/dot.ts";
 import { round } from "./face/round.ts";
 import { buzz } from "./hair/buzz.ts";
 import { mane } from "./hair/mane.ts";
+import { mohican } from "./hair/mohican.ts";
 import { sweep } from "./hair/sweep.ts";
 import { waves } from "./hair/waves.ts";
 
-export const PARTS: readonly Part[] = [round, dot, waves, mane, sweep, buzz];
+export const PARTS: readonly Part[] = [round, dot, waves, mane, sweep, buzz, mohican];
 
 const byId = new Map(PARTS.map((part) => [part.id, part]));
 export const partOf = (id: string): Part | undefined => byId.get(id);

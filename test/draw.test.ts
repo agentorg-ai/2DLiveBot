@@ -49,7 +49,7 @@ test("every hair is one shape over the head whose rim stays and whose hairline i
   const styles = PARTS.filter((part) => part.slot === "hair");
   assert.deepEqual(
     styles.map((part) => part.id),
-    ["waves", "mane", "sweep", "buzz"],
+    ["waves", "mane", "sweep", "buzz", "mohican"],
   );
   for (const part of styles) {
     const hair = draw(parseAvatar(`v1.${part.id}`)).shapes.at(-1);
