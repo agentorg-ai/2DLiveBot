@@ -45,22 +45,33 @@ test("a shape turns when some of it lies on the face, and an eye lies on it whol
   );
 });
 
-test("every hair is one shape over the head whose rim stays and whose hairline is on the face", () => {
+test("every hair is flat shapes whose rim stays and whose hairline is on the face", () => {
   const styles = PARTS.filter((part) => part.slot === "hair");
   assert.deepEqual(
     styles.map((part) => part.id),
-    ["waves", "mane", "sweep", "buzz", "mohican"],
+    ["waves", "mane", "sweep", "buzz", "mohican", "sides"],
   );
   for (const part of styles) {
-    const hair = draw(parseAvatar(`v1.${part.id}`)).shapes.at(-1);
-    assert.ok(hair, part.id);
-    const onFace = hair.segments.map((segment) => segment.face);
-    // A run of rim, a run of hairline, and the rim again to close.
-    const runs = onFace.filter((on, i) => on !== onFace[i - 1]);
-    assert.deepEqual(runs, [false, true, false], part.id);
-    assert.equal(hair.segments.at(-1)?.command, "Z", part.id);
+    const [behind, over] = [
+      part.layers.filter((layer) => layer.z < 40).flatMap((layer) => layer.shapes),
+      part.layers.filter((layer) => layer.z > 40).flatMap((layer) => layer.shapes),
+    ];
+    assert.ok(over.length > 0, part.id);
+    for (const shape of over) {
+      const onFace = segmentsOf(shape.d).map((segment) => segment.face);
+      // A run of rim, a run of hairline, and the rim again to close.
+      const runs = onFace.filter((on, i) => on !== onFace[i - 1]);
+      assert.deepEqual(runs, [false, true, false], part.id);
+      assert.equal(segmentsOf(shape.d).at(-1)?.command, "Z", part.id);
+    }
+    // What is behind the head has nothing on the face.
+    for (const shape of behind)
+      assert.ok(
+        segmentsOf(shape.d).every((segment) => !segment.face),
+        part.id,
+      );
     // One flat colour: every shape of the hair is filled with it and has no line.
-    for (const shape of part.layers.flatMap((layer) => layer.shapes))
+    for (const shape of [...behind, ...over])
       assert.deepEqual([shape.fill, shape.stroke], ["0", undefined], part.id);
   }
 });
