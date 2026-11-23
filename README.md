@@ -71,7 +71,7 @@ reduced motion. All the avatars in a page share one clock, which moves them 30 t
 redraws an avatar only when it would change by a quarter of a screen pixel. A picture is a
 square that fits its figure, so an avatar with full hair is drawn a little smaller.
 
-A seed chooses a face and eyes; hair is put on by a string, as `waves`, `mane` or `quiff`.
+A seed chooses a face and eyes; hair is put on by a string, as `waves`, `mane` or `sweep`.
 
 `parseAvatar` reads a string into its settings and throws `AvatarStringError` for text that is
 not one; `formatAvatar` writes settings back. `PARTS` and `SLOTS` list the catalog, for an editor.
