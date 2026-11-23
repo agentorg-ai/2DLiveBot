@@ -14,17 +14,18 @@ const mirror = (d: string) => {
   });
 };
 
-/** The hair at one side of the head, drawn for the right and reflected for the left. Its rim
- * stands out past the head from the temple down to the jaw, in a flick at the top and two
- * swells below it, and tucks in under the cheek; its inner edge lies on the face. */
+/** The hair at one side of the head, drawn for the right and reflected for the left. It is
+ * fullest beside the cheek, where its rim stands out past the head in two swells and tucks in
+ * under the jaw. Upward it follows the head's curve and thins, fading to nothing short of the
+ * crown. Its inner edge lies on the face. */
 const side = (flip: (d: string) => string): Shape => ({
   d: [
     flip(
-      "M81 35C82.5 31.5 85.5 28.5 89.5 27.5C89 30 90.5 32 92.5 33.5C95.5 36.5 97.5 41.5 97.5 46.5C97.8 52 96.8 56.5 94.5 59.5C97.5 63 97 71 92.5 75C89.5 78.5 84.5 79.5 80.5 77.5",
+      "M68.6 25.75C74 26.5 80 29.5 84.5 34C89.5 37.5 96 40 97.5 46.5C97.8 52 96.8 56.5 94.5 59.5C97.5 63 97 71 92.5 75C89.5 78.5 84.5 79.5 80.5 77.5",
     ),
     face(
       flip(
-        "C82.6 73.5 83.8 68 83.6 62.5C83.4 57 82.6 51 81.6 46C80.8 42.5 80 39.5 79.8 38C79.7 36.8 80.2 35.8 81 35",
+        "C82.6 73.5 83.8 68 83.6 62.5C83.4 57 82.6 51 81.6 46C80.6 41 78 36.5 74.5 32.5C72.5 30 70.5 27.5 68.6 25.75",
       ),
     ),
     "Z",
@@ -32,8 +33,8 @@ const side = (flip: (d: string) => string): Shape => ({
   fill: "0",
 });
 
-/** Bald over the crown, with hair left at each side: a mass that stands out past the head from
- * the temple down to the jaw. */
+/** Bald over the crown, with hair left at each side: full beside the cheeks and fading out
+ * toward the top of the head. */
 export const sides: Part = {
   id: "sides",
   slot: "hair",
