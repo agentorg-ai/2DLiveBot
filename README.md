@@ -79,8 +79,8 @@ redraws an avatar only when it would change by a quarter of a screen pixel. A pi
 square that fits its figure, so an avatar with full hair is drawn a little smaller.
 
 A seed chooses every part: a skin tone, the eyes' colour, one of the hair styles (`waves`, `mane`,
-`sweep`, `sides`) or, for one head in twelve, none, a hair colour, and glasses (`specs`) for one
-avatar in four. Hair and frames are never a colour close to the skin's. `avatarFromSeed` returns
+`sweep`, `sides`) or, for one head in twelve, none, a hair colour, and glasses (`specs`) for three
+avatars in ten. Hair and frames are never a colour close to the skin's. `avatarFromSeed` returns
 the string, so an avatar picked at random is the string of a random seed.
 
 ![Sixty avatars, each made from a different seed](docs/seeds.png)
