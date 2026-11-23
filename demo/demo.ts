@@ -32,10 +32,10 @@ const SEEDS = [
 ];
 /** Avatars with hair, which seeds do not choose yet. */
 const DRESSED = [
+  "v1.round-e9c09c.dot-2a2530.quiff-2d2630",
   "v1.round-f7e3cf.dot-2a2530.mane-9d99a4",
   "v1.round-f7e3cf.dot-2a2530.waves-5b3a2c",
-  "v1.round-e9c09c.dot-2a2530.mane-e6dfd3",
-  "v1.round-f4d6b8.dot-2a2530.waves-2d2630",
+  "v1.round-f4d6b8.dot-2a2530.quiff-a0673c",
   "v1.round-ab7852.dot-2a2530.mane-3b2a26",
   "v1.round-e9c09c.dot-2a2530.waves-b4513a",
 ];
