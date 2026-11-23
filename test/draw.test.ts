@@ -49,7 +49,7 @@ test("every hair is one shape over the head whose rim stays and whose hairline i
   const styles = PARTS.filter((part) => part.slot === "hair");
   assert.deepEqual(
     styles.map((part) => part.id),
-    ["waves", "mane", "sweep"],
+    ["waves", "mane", "sweep", "buzz"],
   );
   for (const part of styles) {
     const hair = draw(parseAvatar(`v1.${part.id}`)).shapes.at(-1);
@@ -84,6 +84,16 @@ test("a path is read stretch by stretch, and written back as it was drawn", () =
     pathText(segments, (x, y) => [x + 100, y]),
     "M1 2L3 4C105 6 107 8 109 10C111 12 113 14 115 16Q1 1 2 2Z",
   );
+  // A long step on the face is cut into pieces that draw the same line, so that it keeps a
+  // smooth curve when a turn moves its points; a long step off the face is left whole.
+  const long = segmentsOf(["M0 0", face("C5 10 15 10 20 0L20 30"), "L0 30Z"]);
+  assert.deepEqual(
+    long.map((segment) => segment.command),
+    ["M", "C", "C", "C", "C", "L", "L", "L", "L", "Z"],
+  );
+  assert.deepEqual(long[2]?.points.slice(-2), [10, 7.5], "the curve's middle is where it was");
+  assert.deepEqual(long[5]?.points, [20, 10]);
+  assert.deepEqual(long[8]?.points, [0, 30], "the step off the face is whole");
   assert.throws(() => segmentsOf("M1 2A3 3 0 0 1 4 5"), /uses A/);
   assert.throws(() => segmentsOf("M1 2 3"), /numbers/);
 });
