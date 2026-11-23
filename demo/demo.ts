@@ -16,6 +16,7 @@ import {
 } from "../src/index.ts";
 import { Avatar as ReactAvatar } from "../src/react.ts";
 
+/** Seeds with names, and after them as many again that are only numbered. */
 const SEEDS = [
   "release-notes",
   "inbox",
@@ -30,7 +31,7 @@ const SEEDS = [
   "support",
   "reviewer",
 ];
-/** Avatars with hair and glasses, which seeds do not choose yet. */
+/** Avatars written out by hand. */
 const DRESSED = [
   "v1.round-f7e3cf.dot-2a2530.sides-4a3128.specs-2a2530",
   "v1.round-e9c09c.dot-2a2530.sweep-2d2630.specs-2a2530",
@@ -180,7 +181,8 @@ function page() {
     into.append(button);
   };
   for (const value of DRESSED) opener(at("dressed"), value, value);
-  for (const name of SEEDS) opener(at("seeded"), avatarFromSeed(name), name);
+  for (const name of [...SEEDS, ...Array.from({ length: 36 }, (_, i) => `agent-${i}`)])
+    opener(at("seeded"), avatarFromSeed(name), name);
 
   for (const size of [20, 28, 40, 64])
     for (const value of DRESSED) mount(at("sizes"), { value, size });
