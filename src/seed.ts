@@ -13,7 +13,8 @@ const CHOICES: Record<Slot, { parts: readonly (string | null)[]; colors: readonl
     colors: [["f7e3cf", "f4d6b8", "e9c09c", "d2a078", "ab7852", "80533a"]],
   },
   eyes: { parts: ["dot"], colors: [["2a2530", "2a2530", "3b2a22", "27364d"]] },
-  // One head in twelve is bald, and one in six is bald over the crown.
+  // One head in twelve is bald, and one in six is bald over the crown. The darkest hair is a soft
+  // black, which still shows on a dark page.
   hair: {
     parts: [
       ...["waves", "waves", "waves", "mane", "mane", "mane"],
@@ -21,7 +22,7 @@ const CHOICES: Record<Slot, { parts: readonly (string | null)[]; colors: readonl
     ],
     colors: [
       [
-        ...["2d2630", "4a3128", "5b3a2c", "7a4a35", "9a4b2e", "c2703d"],
+        ...["453c4d", "4a3128", "5b3a2c", "7a4a35", "9a4b2e", "c2703d"],
         ...["d9a85b", "e6cf9a", "9d99a4", "5d6f8e", "b5687a"],
       ],
     ],

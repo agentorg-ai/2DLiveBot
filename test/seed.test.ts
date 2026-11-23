@@ -9,7 +9,7 @@ test("a seed's avatar is the same on every machine and in every release", () => 
     [
       "v1.round-f4d6b8.dot-2a2530.mane-4a3128",
       "v1.round-d2a078.dot-2a2530.mane-5b3a2c",
-      "v1.round-ab7852.dot-3b2a22.mane-2d2630.specs-7d2f3a",
+      "v1.round-ab7852.dot-3b2a22.mane-453c4d.specs-7d2f3a",
       "v1.round-80533a.dot-2a2530.waves-c2703d.specs-2a2530",
     ],
   );
