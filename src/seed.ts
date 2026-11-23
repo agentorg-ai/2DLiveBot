@@ -8,9 +8,10 @@ import { type Avatar, formatAvatar } from "./string.ts";
  * and `null` leaves the slot empty, and the colours for each colour a part takes. A seed's
  * avatar changes when its slot's row here does, so a row is added to, not reordered. */
 const CHOICES: Record<Slot, { parts: readonly (string | null)[]; colors: readonly string[][] }> = {
+  // The lightest skin a seed draws still holds its edge on a light page.
   face: {
     parts: ["round"],
-    colors: [["f7e3cf", "f4d6b8", "e9c09c", "d2a078", "ab7852", "80533a"]],
+    colors: [["f4d6b8", "e9c09c", "d2a078", "ab7852", "80533a"]],
   },
   eyes: { parts: ["dot"], colors: [["2a2530", "2a2530", "3b2a22", "27364d"]] },
   // One head in twelve is bald, and one in six is bald over the crown. The darkest hair is a soft

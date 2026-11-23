@@ -8,7 +8,7 @@ test("a seed's avatar is the same on every machine and in every release", () => 
     ["", "release-notes", "agent-1", "7f3a9c2e-1b4d-4e8a-9c0f-2d6b5a8e1f37"].map(avatarFromSeed),
     [
       "v1.round-f4d6b8.dot-2a2530.mane-4a3128",
-      "v1.round-d2a078.dot-2a2530.mane-5b3a2c",
+      "v1.round-ab7852.dot-2a2530.mane-5b3a2c",
       "v1.round-ab7852.dot-3b2a22.mane-453c4d.specs-7d2f3a",
       "v1.round-80533a.dot-2a2530.waves-c2703d.specs-2a2530",
     ],
@@ -19,7 +19,7 @@ const made = Array.from({ length: 600 }, (_, i) => parseAvatar(avatarFromSeed(`a
 const share = (count: number) => count / made.length;
 
 test("seeds spread over every slot: skins, hair styles and colours, and glasses for some", () => {
-  assert.equal(new Set(made.map((avatar) => avatar.face?.colors[0])).size, 6);
+  assert.equal(new Set(made.map((avatar) => avatar.face?.colors[0])).size, 5);
   assert.ok(new Set(made.map((avatar) => avatar.eyes?.colors[0])).size >= 3);
   assert.deepEqual([...new Set(made.map((avatar) => avatar.hair?.id ?? "none"))].sort(), [
     "mane",
