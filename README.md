@@ -9,8 +9,9 @@ The library has no dependencies and loads nothing: every drawing is in its code.
 SVG with DOM calls and moves it through SVG attributes, so it works under a content policy that
 allows neither inline styles nor code from text.
 
-This is a prototype: the face, the eyes, four hair styles, each flat and known by its
-outline, and a pair of glasses.
+It is on npm as [`@agentorg/2dlivebot`](https://www.npmjs.com/package/@agentorg/2dlivebot). The
+catalog is small so far: the face, the eyes, four hair styles, each flat and known by its outline,
+and a pair of glasses.
 
 ![The four hair styles, each front on and looking left, right and down](docs/hair.png)
 
