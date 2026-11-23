@@ -109,13 +109,16 @@ test("as the head turns, what lies on the face travels round it and narrows towa
 
 test("a rim of the glasses stays about its eye through a turn, and narrows with it", () => {
   const turned = settled({ x: 1, y: 0 });
-  // The far eye's rim: its left, right, top and bottom, 8.8 from the eye's middle.
+  // The far eye's rim: its left, right, top and bottom, as far from the eye's middle as a rim
+  // reaches across and down.
+  const [across, down] = [10.8, 9.8];
   const eye = placed(turned, 66.5, 60);
-  const [left, right] = [placed(turned, 57.7, 60), placed(turned, 75.3, 60)];
-  const [top, bottom] = [placed(turned, 66.5, 51.2), placed(turned, 66.5, 68.8)];
+  const [left, right] = [placed(turned, 66.5 - across, 60), placed(turned, 66.5 + across, 60)];
+  const [top, bottom] = [placed(turned, 66.5, 60 - down), placed(turned, 66.5, 60 + down)];
   assert.ok(left[0] < eye[0] && eye[0] < right[0] && top[1] < eye[1] && eye[1] < bottom[1]);
-  assert.ok(right[0] - left[0] < 17.6 * 0.95, "it is narrower than it is drawn");
-  assert.ok(right[0] - left[0] < bottom[1] - top[1], "and narrower than it is tall");
+  const [wide, tall] = [right[0] - left[0], bottom[1] - top[1]];
+  assert.ok(wide < across * 2 * 0.95, "it is narrower than it is drawn");
+  assert.ok(wide / tall < across / down, "and narrower for its height than it is drawn");
   assert.ok(Math.hypot((right[0] - 50) / 38, (right[1] - 55.5) / 33) < 1, "and on the face");
 });
 
