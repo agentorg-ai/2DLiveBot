@@ -78,6 +78,8 @@ A seed chooses every part: a skin tone, the eyes' colour, one of the hair styles
 avatar in four. Hair and frames are never a colour close to the skin's. `avatarFromSeed` returns
 the string, so an avatar picked at random is the string of a random seed.
 
+![Sixty avatars, each made from a different seed](docs/seeds.png)
+
 `parseAvatar` reads a string into its settings and throws `AvatarStringError` for text that is
 not one; `formatAvatar` writes settings back. `PARTS` and `SLOTS` list the catalog, for an editor.
 
