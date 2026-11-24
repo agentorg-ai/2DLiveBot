@@ -40,6 +40,20 @@ const LEAN = { x: 2.2, y: 1.4, tilt: 3 } as const;
 
 const within = (value: number) => Math.max(-1, Math.min(1, value));
 
+/** How near the pointer must come for an avatar to notice it, from its middle, in avatar widths:
+ * a width and a half beyond its edge. */
+const NEAR = 2;
+
+/** Where an avatar looks at the pointer, from where the pointer is from its middle in avatar
+ * widths, eased so that farther is less and less farther. A pointer beyond what it notices gets
+ * no look, and the avatar goes on moving by itself. */
+export function aimAt(x: number, y: number): Aim | undefined {
+  const distance = Math.hypot(x, y);
+  if (distance > NEAR) return undefined;
+  const reach = distance + 1.2;
+  return { x: x / reach, y: y / reach };
+}
+
 /** The pose an avatar comes to rest in when it looks one way: the head turned most of the way,
  * leaning with the turn, and the eyes the rest. */
 export function settled(look: Aim): Pose {

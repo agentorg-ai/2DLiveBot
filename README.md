@@ -3,7 +3,7 @@
 Animated character avatars for the web, drawn flat. An avatar is a soft, wide head with two dot
 eyes, and hair and glasses on it. One string holds every setting of an avatar, and
 mounting that string in a page makes the avatar live: it breathes, blinks, looks about, turns
-its head and follows the pointer, and what it wears turns with it.
+its head and follows the pointer when it comes near, and what it wears turns with it.
 
 The library has no dependencies and loads nothing: every drawing is in its code. It builds its
 SVG with DOM calls and moves it through SVG attributes, so it works under a content policy that
@@ -113,7 +113,8 @@ That one rule gives each kind of thing its view of a turn:
 ![An avatar with curling hair, turned 21 ways: left to right and up to down](docs/turning.png)
 
 The eyes look first and the head follows most of the way on a spring, going a little past and
-settling. The head stretches up as it breathes in and dips when it starts to turn. A blink
+settling. A live avatar follows the pointer while it moves within a width and a half of the
+avatar's edge, and for a moment after; farther off, the avatar goes on with what it was doing. The head stretches up as it breathes in and dips when it starts to turn. A blink
 closes each eye onto its own middle.
 
 ## Parts
