@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createMotion, type State, settled } from "../src/motion.ts";
+import { aimAt, createMotion, type State, settled } from "../src/motion.ts";
 import { headTransform, mover, type Pose, REST, turnOf } from "../src/pose.ts";
 
 const FRAME = 1 / 30;
@@ -67,6 +67,38 @@ test("asleep, the eyes close and stay closed; awake again, they open", () => {
 test("working, the eyes are on what is below", () => {
   const poses = run(11, 6, "working").slice(60);
   assert.ok(poses.every((pose) => pose.turnY > 0.2));
+});
+
+test("the pointer is looked at only near the avatar, toward where it is", () => {
+  // In avatar widths from its middle: half a width is its edge.
+  for (const [x, y] of [
+    [0.3, 0],
+    [-1.4, 0],
+    [0, 1.9],
+    [1.3, -1.3],
+  ] as const) {
+    const aim = aimAt(x, y);
+    assert.ok(aim, `noticed at ${x}, ${y}`);
+    assert.equal(Math.sign(aim.x), Math.sign(x));
+    assert.equal(Math.sign(aim.y), Math.sign(y));
+    assert.ok(Math.hypot(aim.x, aim.y) < 1);
+  }
+  for (const [x, y] of [
+    [2.6, 0],
+    [0, -3],
+    [-2, 2],
+    [40, 10],
+  ] as const)
+    assert.equal(aimAt(x, y), undefined, `not noticed at ${x}, ${y}`);
+});
+
+test("with the pointer away, a working avatar reads again", () => {
+  const motion = createMotion(11);
+  for (let i = 0; i < 60; i++) motion.step(FRAME, "working", aimAt(1, -1));
+  assert.ok(motion.step(FRAME, "working", aimAt(1, -1)).turnY < 0, "it looks up at the pointer");
+  let pose = REST;
+  for (let i = 0; i < 60; i++) pose = motion.step(FRAME, "working", aimAt(9, -9));
+  assert.ok(pose.turnY > 0.2, "and back down at its work");
 });
 
 test("a long gap moves the avatar no further than a slow frame does", () => {

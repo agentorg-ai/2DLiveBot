@@ -3,7 +3,7 @@
 // works under a content policy that allows neither inline styles nor code from text.
 import { type Drawing, type Drawn, draw } from "./draw.ts";
 import { hash } from "./hash.ts";
-import { type Aim, createMotion, type Motion, type State, settled } from "./motion.ts";
+import { type Aim, aimAt, createMotion, type Motion, type State, settled } from "./motion.ts";
 import { pathText } from "./path.ts";
 import { headTransform, mover, REST, turnOf } from "./pose.ts";
 import { avatarFromSeed } from "./seed.ts";
@@ -18,8 +18,8 @@ export type Options = {
   size?: number;
   /** Stand still: as drawn, or turned the way `look` says. */
   still?: boolean;
-  /** Where it looks, from its middle: each from -1 to 1, right and down. Without one it looks
-   * about by itself and follows the pointer. */
+  /** Where it looks, from its middle: each from -1 to 1, right and down. Without one it moves
+   * by itself, and follows the pointer while the pointer moves near it. */
   look?: Aim;
   /** What the avatar is doing. */
   state?: State;
@@ -53,7 +53,7 @@ type Live = {
 };
 
 const SVG = "http://www.w3.org/2000/svg";
-/** Eyes follow the pointer while it moves and for this long after, in milliseconds. */
+/** Eyes follow the pointer while it moves near and for this long after, in milliseconds. */
 const FOLLOW = 2500;
 const MEASURE = 300;
 /** The least time between two moves, in milliseconds: 30 moves a second on any screen. */
@@ -104,8 +104,7 @@ function pose(live: Live, at: typeof REST) {
   }
 }
 
-/** Where the pointer is from an avatar's middle, in avatar widths, eased so that far away is
- * nearly as far as it goes. */
+/** Where the avatar looks at the pointer, or nothing while the pointer is still or far off. */
 function aimOf(live: Live, now: number): Aim | undefined {
   if (live.look) return live.look;
   if (!pointer || now - pointer.at > FOLLOW) return undefined;
@@ -120,9 +119,7 @@ function aimOf(live: Live, now: number): Aim | undefined {
   }
   const { x, y, width } = live.box;
   if (!width) return undefined;
-  const [dx, dy] = [(pointer.x - x) / width, (pointer.y - y) / width];
-  const reach = Math.hypot(dx, dy) + 1.2;
-  return { x: dx / reach, y: dy / reach };
+  return aimAt((pointer.x - x) / width, (pointer.y - y) / width);
 }
 
 function tick(now: number) {
